@@ -2,7 +2,7 @@ Cyber Warrior .PROD - Director's Dashboard
 
 Overview
 
-Cyber Warrior .PROD is a specialized, interactive Single Page Application (SPA) designed to function as the "Mission Control" for the production of the Red Deer Polytechnic Cybersecurity advertisement.
+Cyber Warrior .PROD is a specialized, interactive Single Page Application (SPA) designed by Cyber SoHo to function as the "Mission Control" for the production of the Red Deer Polytechnic New Cybersecurity Content and Courses' Advertisement.
 
 This dashboard transforms the production script into an interactive director's monitor, allowing for real-time tracking of shots, logistical planning by location, and analysis of video pacing/energy.
 
@@ -56,5 +56,6 @@ Internal Storyboarding: Establishing the intended mood and pacing.
 Educational Planning: Demonstrating the "Energy Flow" of the advertisement.
 
 No ownership of these sound recordings or musical compositions is claimed by the author. Any public release, broadcast, or commercial use of the final video containing these tracks must comply with relevant copyright laws, including obtaining necessary synchronization licenses or adhering to "Fair Use" regulations where applicable.
+
 
 Created by Cyber SoHo for Red Deer Polytechnic's New Cyber Projects' Add.
