@@ -3,439 +3,321 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Cyber Warrior | Director's Dashboard</title>
+    <title>Cyber Warrior: Production Director's Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f5f5f4; /* Warm neutral light gray */
-            color: #1c1917; /* Stone 900 */
-        }
-
-        /* Custom Scrollbar for better UX in panels */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #e7e5e4; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #a8a29e; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #78716c; 
-        }
-
-        /* Chart Container Strict Styling */
+        /* Chart Container Styling - MANDATORY */
         .chart-container {
             position: relative;
             width: 100%;
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
-            height: 300px;
-            max-height: 350px;
+            height: 300px; /* Base height */
+            max-height: 400px;
         }
+
         @media (min-width: 768px) {
             .chart-container {
                 height: 350px;
             }
         }
 
-        .scene-card {
-            transition: all 0.2s ease-in-out;
-            border-left: 4px solid transparent;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-        .scene-card.active {
-            border-left-color: #ea580c; /* Orange 600 */
-            background-color: #fff7ed; /* Orange 50 */
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
         }
-        .scene-card:hover {
-            transform: translateX(4px);
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
-        .tech-tag {
-            font-size: 0.75rem;
-            padding: 2px 8px;
-            border-radius: 9999px;
+        body {
+            background-color: #f8fafc; /* Slate 50 */
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #0f172a; /* Slate 900 */
+        }
+
+        .tab-active {
+            border-bottom: 2px solid #ea580c; /* Orange 600 */
+            color: #ea580c;
             font-weight: 600;
         }
-        .tag-insta { background-color: #fef08a; color: #854d0e; } /* Yellow */
-        .tag-iphone { background-color: #bae6fd; color: #0369a1; } /* Blue */
-        .tag-ai { background-color: #e9d5ff; color: #7e22ce; } /* Purple */
 
-        .hidden-section {
-            display: none;
+        .scene-item.active {
+            border-left: 4px solid #ea580c;
+            background-color: #fff7ed; /* Orange 50 */
         }
     </style>
-    <!-- Chosen Palette: Warm Neutrals (Stone) with Energetic Orange Accents to match the 'Aggressive' but professional tone. -->
+    <!-- Chosen Palette: Slate (Neutral Backgrounds) + Orange (High Energy/Action) + Blue (Tech/Server) -->
+    <!-- Application Structure Plan: The application is designed as a 'Mission Control' dashboard for the Director/Creator. It is divided into three main functional areas:
+         1. 'Storyboard & Execution': The primary workspace, transforming the linear markdown script into an interactive, step-by-step production guide. It allows the user to filter by location (grouping shots for efficiency) and view specific camera/audio details.
+         2. 'Production Analytics': Visualizes the pacing (Energy Flow) and logistics (Location Breakdown) to ensure the 'aggressive' tone is met without exhausting the viewer.
+         3. 'Budget Intelligence': A dedicated financial analysis section visualizing the massive cost savings (Classical vs. AI) outlined in the report, validating the production strategy.
+         This structure prioritizes 'Actionability'—moving from reading the script to shooting it. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 </head>
-<body class="bg-stone-100 min-h-screen">
+<body class="min-h-screen flex flex-col">
 
-    <!-- Application Structure Plan: 
-         The app is designed as a "Mission Control" for the video shoot.
-         1. Header: High-level status and quick stats.
-         2. Main Nav: Switches between the chronological 'Script/Storyboard', the 'Tech Guide', and 'Analytics'.
-         3. Storyboard View (Core): Split screen. Left side is the timeline (interactive list). Right side is the 'Detail View' showing dialogue, action, and music for the selected scene. This allows the user to focus on one shot at a time.
-         4. Analytics View: Visualizes the 'Pacing' (Energy vs Time) to ensure the video flows correctly, and 'Location Breakdown' to help group shots for efficiency.
-         5. Tech Guide: Static reference for the complex camera settings and AI prompts.
-    -->
-
-    <!-- Main Container -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <!-- Header -->
-        <header class="mb-8 flex flex-col md:flex-row md:items-center justify-between border-b border-stone-300 pb-6">
-            <div>
-                <h1 class="text-4xl font-extrabold text-stone-900 tracking-tight">THE CYBER WARRIOR <span class="text-orange-600">.PROD</span></h1>
-                <p class="mt-2 text-stone-600 max-w-2xl">
-                    Interactive Production Dashboard for Red Deer Polytechnic Advertisement. 
-                    <span class="font-semibold text-stone-800">Target Duration: 90s</span>
-                </p>
-            </div>
-            <div class="mt-4 md:mt-0 flex gap-4">
-                <div class="bg-white p-4 rounded-lg shadow-sm border border-stone-200 text-center">
-                    <span class="block text-2xl font-bold text-stone-900" id="scene-count-display">0</span>
-                    <span class="text-xs text-stone-500 uppercase tracking-wide">Scenes</span>
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">🎬</span>
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-800">Cyber Warrior <span class="text-orange-600">.PROD</span></h1>
+                        <p class="text-xs text-slate-500">Interactive Production Script & Planner</p>
+                    </div>
                 </div>
-                <div class="bg-white p-4 rounded-lg shadow-sm border border-stone-200 text-center">
-                    <span class="block text-2xl font-bold text-stone-900">4</span>
-                    <span class="text-xs text-stone-500 uppercase tracking-wide">Locations</span>
+                <div class="flex space-x-8">
+                    <button onclick="switchTab('execution')" id="tab-execution" class="tab-active px-3 py-2 text-sm font-medium transition-colors">Execution & Script</button>
+                    <button onclick="switchTab('analytics')" id="tab-analytics" class="px-3 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors">Pacing & Logistics</button>
+                    <button onclick="switchTab('budget')" id="tab-budget" class="px-3 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors">Budget Analysis</button>
                 </div>
             </div>
-        </header>
-
-        <!-- Contextual Intro -->
-        <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 mb-8">
-            <h2 class="text-lg font-bold text-stone-800 mb-2">Production Mission</h2>
-            <p class="text-stone-600 leading-relaxed">
-                This dashboard translates your raw script into an actionable shooting plan. 
-                Use the <strong>Storyboard</strong> tab to step through each scene while filming. 
-                Refer to the <strong>Tech Specs</strong> for camera settings, and check <strong>Analytics</strong> to visualize the emotional arc of the video.
-                The goal is to blend aggressive energy with humor, utilizing your Gym, Server Room, and Greenhouse assets.
-            </p>
         </div>
+    </header>
 
-        <!-- Navigation -->
-        <nav class="flex space-x-1 bg-stone-200 p-1 rounded-lg mb-8 max-w-md mx-auto md:mx-0">
-            <button onclick="switchTab('storyboard')" id="tab-storyboard" class="flex-1 py-2.5 px-4 rounded-md text-sm font-medium focus:outline-none transition-colors bg-white text-stone-900 shadow">Storyboard</button>
-            <button onclick="switchTab('analytics')" id="tab-analytics" class="flex-1 py-2.5 px-4 rounded-md text-sm font-medium focus:outline-none transition-colors text-stone-600 hover:text-stone-900">Analytics</button>
-            <button onclick="switchTab('tech')" id="tab-tech" class="flex-1 py-2.5 px-4 rounded-md text-sm font-medium focus:outline-none transition-colors text-stone-600 hover:text-stone-900">Tech Specs</button>
-        </nav>
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
 
-        <!-- VIEW: STORYBOARD (Main Interaction Area) -->
-        <div id="view-storyboard" class="block">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- VIEW: EXECUTION & SCRIPT -->
+        <div id="view-execution" class="space-y-6">
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h2 class="text-lg font-bold text-slate-800 mb-2">Director's Script Board</h2>
+                <p class="text-slate-600 mb-4 text-sm">
+                    This interactive storyboard breaks down your 90-second timeline into actionable blocks. 
+                    Select a scene to view the specific dialogue, camera angles (Insta360 vs iPhone), and audio cues. 
+                    Use the location filters to batch your filming (e.g., shoot all "Gym" scenes at once).
+                </p>
                 
-                <!-- Scene List (Left Column) -->
-                <div class="lg:col-span-1 flex flex-col h-[600px]">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xl font-bold text-stone-800">Shot List</h3>
-                        <div class="text-xs font-mono bg-stone-800 text-white px-2 py-1 rounded">Total: 90s</div>
-                    </div>
-                    
-                    <!-- Filters -->
-                    <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
-                        <button onclick="filterScenes('all')" class="text-xs bg-stone-800 text-white px-3 py-1.5 rounded-full whitespace-nowrap">All</button>
-                        <button onclick="filterScenes('Gym')" class="text-xs bg-stone-200 hover:bg-stone-300 text-stone-800 px-3 py-1.5 rounded-full whitespace-nowrap">Gym</button>
-                        <button onclick="filterScenes('Server')" class="text-xs bg-stone-200 hover:bg-stone-300 text-stone-800 px-3 py-1.5 rounded-full whitespace-nowrap">Servers</button>
-                        <button onclick="filterScenes('Greenhouse')" class="text-xs bg-stone-200 hover:bg-stone-300 text-stone-800 px-3 py-1.5 rounded-full whitespace-nowrap">Greenhouse</button>
-                    </div>
-
-                    <!-- Scrollable List -->
-                    <div id="scene-list-container" class="flex-1 overflow-y-auto pr-2 space-y-3">
-                        <!-- JS will populate scenes here -->
-                    </div>
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <span class="text-sm font-semibold text-slate-500 self-center mr-2">Filter by Location:</span>
+                    <button onclick="filterScenes('all')" class="filter-btn bg-slate-800 text-white px-3 py-1 rounded-full text-xs hover:opacity-90 transition">All Scenes</button>
+                    <button onclick="filterScenes('Gym')" class="filter-btn bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs hover:bg-orange-100 transition">🏋️ Gym</button>
+                    <button onclick="filterScenes('Server Room')" class="filter-btn bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs hover:bg-blue-100 transition">💻 Server Room</button>
+                    <button onclick="filterScenes('Office')" class="filter-btn bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs hover:bg-slate-200 transition">🏢 Office</button>
+                    <button onclick="filterScenes('Greenhouse')" class="filter-btn bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs hover:bg-green-100 transition">🌱 Greenhouse</button>
                 </div>
 
-                <!-- Scene Detail (Right Column - Sticky) -->
-                <div class="lg:col-span-2">
-                    <div id="scene-detail-panel" class="bg-white rounded-2xl shadow-lg border border-stone-200 p-8 h-full flex flex-col justify-center items-center text-center transition-all duration-300">
-                        <div class="text-stone-400">Select a scene to view director's notes</div>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[600px]">
+                    <!-- Scene List (Left) -->
+                    <div class="lg:col-span-4 overflow-y-auto border-r border-slate-100 pr-2" id="scene-list">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Scene Details (Right) -->
+                    <div class="lg:col-span-8 bg-slate-50 rounded-xl p-6 flex flex-col border border-slate-200 relative overflow-hidden">
+                        <div id="scene-detail-content" class="h-full flex flex-col justify-between z-10 relative">
+                            <!-- Detail content goes here -->
+                            <div class="text-center mt-20 text-slate-400">Select a scene to view details</div>
+                        </div>
+                        <!-- Background Watermark -->
+                        <div class="absolute top-0 right-0 opacity-5 text-9xl font-bold pointer-events-none select-none">
+                            ACTION
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- VIEW: ANALYTICS -->
-        <div id="view-analytics" class="hidden-section">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Chart 1: Energy Flow -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
-                    <h3 class="text-lg font-bold text-stone-800 mb-2">Video Pacing & Energy Flow</h3>
-                    <p class="text-sm text-stone-500 mb-6">Visualizing the emotional intensity. We want spikes of high energy (Metallica) contrasted with sudden drops (Humor/Greenhouse).</p>
-                    <div class="chart-container">
-                        <canvas id="energyChart"></canvas>
+        <div id="view-analytics" class="hidden space-y-6">
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h2 class="text-lg font-bold text-slate-800 mb-2">Production Analytics</h2>
+                <p class="text-slate-600 mb-6 text-sm">
+                    Analyze the emotional arc and logistical requirements of the script. 
+                    The "Energy Flow" chart ensures the video maintains the "aggressive" pacing with comedic dips, while the "Location Breakdown" helps in planning equipment moves.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Energy Chart -->
+                    <div class="flex flex-col">
+                        <h3 class="font-semibold text-slate-700 mb-4 text-center">Energy & Pacing Arc</h3>
+                        <div class="chart-container">
+                            <canvas id="energyChart"></canvas>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2 text-center">Highs = Metal/Aggressive. Lows = Comedy/Greenhouse.</p>
+                    </div>
+
+                    <!-- Location Chart -->
+                    <div class="flex flex-col">
+                        <h3 class="font-semibold text-slate-700 mb-4 text-center">Location Breakdown (Logistics)</h3>
+                        <div class="chart-container">
+                            <canvas id="locationChart"></canvas>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2 text-center">Shoot scenes grouped by color to save setup time.</p>
                     </div>
                 </div>
+            </div>
+            
+            <!-- Tech Stats Row -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                    <div class="text-orange-600 text-2xl font-bold mb-1">90s</div>
+                    <div class="text-sm text-slate-500 uppercase font-semibold">Total Duration</div>
+                </div>
+                <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                    <div class="text-blue-600 text-2xl font-bold mb-1">8s</div>
+                    <div class="text-sm text-slate-500 uppercase font-semibold">Max Clip Length</div>
+                </div>
+                <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                    <div class="text-green-600 text-2xl font-bold mb-1">5</div>
+                    <div class="text-sm text-slate-500 uppercase font-semibold">Music Tracks</div>
+                </div>
+            </div>
+        </div>
 
-                <!-- Chart 2: Location Breakdown -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
-                    <h3 class="text-lg font-bold text-stone-800 mb-2">Location Logistics</h3>
-                    <p class="text-sm text-stone-500 mb-6">Efficiency breakdown. Shoot all scenes in one location before moving to the next.</p>
-                    <div class="chart-container">
-                        <canvas id="locationChart"></canvas>
+        <!-- VIEW: BUDGET -->
+        <div id="view-budget" class="hidden space-y-6">
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h2 class="text-lg font-bold text-slate-800 mb-2">Budget Intelligence: Classical vs. AI-Powered</h2>
+                <p class="text-slate-600 mb-6 text-sm">
+                    A sharp recap of the financial advantage. By leveraging owned equipment (iPhone 16, Insta360) and AI tools (Gemini Ultra, Veo), the production costs are reduced by approximately <strong>99.5%</strong> compared to traditional agency rates.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <!-- Cost Chart -->
+                    <div>
+                         <div class="chart-container">
+                            <canvas id="budgetChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Data Breakdown -->
+                    <div class="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-100">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Category</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Classical Quote</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-green-600 uppercase tracking-wider">Your Setup</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-slate-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">Crew & Gear</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-slate-600">$3,500+</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-slate-900">$0</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">B-Roll & FX</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-slate-600">$800+</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-slate-900">~$27</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">Editing</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-slate-600">$1,500+</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-slate-900">$0</td>
+                                </tr>
+                                <tr class="bg-orange-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-base font-bold text-orange-800">TOTAL</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-base text-right font-bold text-red-600">~$5,800+</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-base text-right font-bold text-green-700">~$27</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="p-4 bg-green-100 text-green-800 text-sm font-medium text-center">
+                            Savings: ~99.5%
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- VIEW: TECH SPECS -->
-        <div id="view-tech" class="hidden-section">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
-                <!-- Camera Settings -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
-                    <h3 class="text-xl font-bold text-stone-800 mb-4 border-b pb-2">📸 Camera Settings</h3>
-                    
-                    <div class="space-y-6">
-                        <div>
-                            <h4 class="font-bold text-orange-600 flex items-center gap-2">
-                                <span>📱</span> iPhone 16 Pro Max
-                            </h4>
-                            <ul class="mt-2 space-y-2 text-sm text-stone-700">
-                                <li class="flex items-start gap-2"><span class="text-green-500">✔</span> <strong>Resolution:</strong> 4K at 24fps (Cinematic) or 30fps.</li>
-                                <li class="flex items-start gap-2"><span class="text-green-500">✔</span> <strong>Mode:</strong> Use "Cinematic Mode" for Office shots (tap face to focus).</li>
-                                <li class="flex items-start gap-2"><span class="text-green-500">✔</span> <strong>Lens:</strong> 0.5x (Ultra Wide) for Server Room, 1x for Office.</li>
-                            </ul>
-                        </div>
+    </main>
 
-                        <div>
-                            <h4 class="font-bold text-yellow-600 flex items-center gap-2">
-                                <span>🔭</span> Insta360
-                            </h4>
-                            <ul class="mt-2 space-y-2 text-sm text-stone-700">
-                                <li class="flex items-start gap-2"><span class="text-green-500">✔</span> <strong>Res:</strong> 5.7K @ 30fps.</li>
-                                <li class="flex items-start gap-2"><span class="text-green-500">✔</span> <strong>Profile:</strong> "Vivid" Color Profile.</li>
-                                <li class="flex items-start gap-2"><span class="text-green-500">✔</span> <strong>Trick:</strong> Keep selfie stick perfectly straight under camera for "Invisible" effect.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- AI Prompts -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
-                    <h3 class="text-xl font-bold text-stone-800 mb-4 border-b pb-2">🤖 Gemini/Veo Prompts</h3>
-                    <p class="text-sm text-stone-500 mb-4">Copy these prompts into VideoFX/Veo for your B-Roll.</p>
-
-                    <div class="space-y-4">
-                        <div class="bg-stone-50 p-4 rounded border border-stone-200">
-                            <label class="text-xs font-bold text-stone-500 uppercase">Prompt 1: The Shield</label>
-                            <p class="text-sm text-stone-800 mt-1 italic">"Cinematic close up, abstract visualization of digital data streams, glowing blue and green binary code, forming a protective shield shape, dark background, cyberpunk style, high resolution, photorealistic."</p>
-                            <button onclick="copyToClipboard('p1')" class="mt-2 text-xs bg-stone-200 hover:bg-stone-300 text-stone-800 px-3 py-1 rounded transition-colors">Copy Prompt</button>
-                            <span id="p1-msg" class="text-xs text-green-600 ml-2 hidden">Copied!</span>
-                        </div>
-
-                        <div class="bg-stone-50 p-4 rounded border border-stone-200">
-                            <label class="text-xs font-bold text-stone-500 uppercase">Prompt 2: The Threat</label>
-                            <p class="text-sm text-stone-800 mt-1 italic">"Abstract digital visualization of a red computer virus being quarantined by a green digital grid, moody lighting, technological interface style."</p>
-                            <button onclick="copyToClipboard('p2')" class="mt-2 text-xs bg-stone-200 hover:bg-stone-300 text-stone-800 px-3 py-1 rounded transition-colors">Copy Prompt</button>
-                            <span id="p2-msg" class="text-xs text-green-600 ml-2 hidden">Copied!</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Visualization & Content Choices: 
-         1. Scene List & Detail View: Replaces the linear Markdown script. Allows the user to select scenes non-linearly (e.g., if they are currently in the Gym, they can just click the Gym scenes).
-         2. Energy Chart (Line): Shows the 'Aggressive' vs 'Humor' dynamic. Helps the user understand the 'vibe' shift required for each scene.
-         3. Location Chart (Doughnut): Helps with logistics. Seeing that 30% of the video is in the Gym helps plan the day.
-         4. Tech Specs: Static text but organized for quick mobile reference.
-         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    <!-- Visualization & Content Choices:
+         1. Storyboard List: Represents the 'Shot List'. Users interact by clicking scenes to see details. Goal: Organize execution.
+         2. Energy Chart (Line): Represents 'Music Palette & Tone'. Data points inferred from song choices (Metallica vs Hot Butter). Goal: Inform pacing.
+         3. Budget Chart (Bar): Represents 'Budget Recap'. Comparison of $5800 vs $27. Goal: Compare costs visually.
+         4. Location Chart (Doughnut): Represents 'Locations'. Goal: Logistic planning.
+         Library: Chart.js used for all charts due to canvas requirements and responsiveness.
     -->
 
     <script>
-        // --- DATA STORAGE ---
-        // Derived from production_script.md
+        // --- DATA ---
         const scenes = [
-            {
-                id: 1,
-                time: "0:00 - 0:08",
-                title: "The Hook",
-                location: "Gym",
-                cam: "Insta360",
-                camDetail: "Invisible Selfie Stick mode. Hold low, simulating barbell POV.",
-                action: "Bench pressing or curling heavy weights. Intense look.",
-                audio: "Lux Æterna - Metallica (Intro riff)",
-                dialogue: "You think *this* is heavy? Try stopping a DDoS attack on a Friday night!",
-                energy: 9, // 1-10 scale
-                tags: ["insta", "gym"]
-            },
-            {
-                id: 2,
-                time: "0:08 - 0:16",
-                title: "The Intro",
-                location: "Server Room",
-                cam: "iPhone 16",
-                camDetail: "Cinematic Mode. Slow pan across blinking lights.",
-                action: "Walk into frame, serious face, then smile.",
-                audio: "It's Electric - Metallica",
-                dialogue: "I’m Asen Grozdanov. I teach the new Cybersecurity certificates at Red Deer Polytechnic. Welcome to the matrix.",
-                energy: 7,
-                tags: ["iphone", "tech"]
-            },
-            {
-                id: 3,
-                time: "0:16 - 0:24",
-                title: "The Program",
-                location: "Office",
-                cam: "iPhone 16",
-                camDetail: "Wide Angle (1x). Sophisticated chair shot.",
-                action: "Sitting in chair. Fast hand gestures. Graphics pop up.",
-                audio: "Lower volume background beat.",
-                dialogue: "Two paths. 12 weeks for the Essentials Analyst. 14 weeks for the Specialist. Beginner to pro faster than a fiber optic connection.",
-                energy: 6,
-                tags: ["iphone", "office"]
-            },
-            {
-                id: 4,
-                time: "0:24 - 0:32",
-                title: "The Contrast",
-                location: "Greenhouse",
-                cam: "Insta360",
-                camDetail: "Tiny Planet mode. World looks like a small globe.",
-                action: "Delicately pruning a plant. Intense focus.",
-                audio: "Pop Corn - Hot Butter (Sudden funny switch)",
-                dialogue: "Cybersecurity is just like gardening... except the bugs are Russian botnets and the weeds steal your credit card info.",
-                energy: 4,
-                tags: ["insta", "funny"]
-            },
-            {
-                id: 5,
-                time: "0:32 - 0:40",
-                title: "The Jobs",
-                location: "Gym",
-                cam: "iPhone 16",
-                camDetail: "Low angle looking up.",
-                action: "Doing pull-ups or hitting punching bag.",
-                audio: "One More Road to Cross - DMX",
-                dialogue: "This training gets you hired. SOC Analyst, Incident Responder. High demand, high stress, high reward.",
-                energy: 8,
-                tags: ["iphone", "gym"]
-            },
-            {
-                id: 6,
-                time: "0:40 - 0:48",
-                title: "The Story",
-                location: "Office",
-                cam: "iPhone 16",
-                camDetail: "Standard professional shot.",
-                action: "Lean into camera confidentially.",
-                audio: "Fly Like an Eagle - Seal",
-                dialogue: "When I worked in Big Tech, they didn't hire me for my looks. They hired me because I could hunt digital ghosts. I'm teaching you those exact skills.",
-                energy: 5,
-                tags: ["iphone", "office"]
-            },
-            {
-                id: 7,
-                time: "0:48 - 0:56",
-                title: "The Why",
-                location: "Server Room",
-                cam: "Insta360",
-                camDetail: "Walk through room holding stick out (drone sim).",
-                action: "Gesturing to the equipment.",
-                audio: "Sabbra Cadabra - Metallica",
-                dialogue: "Why do it? Because grandma needs her pension safe, and the power grid needs to stay on. We are the digital bodyguards of society.",
-                energy: 8,
-                tags: ["insta", "tech"]
-            },
-            {
-                id: 8,
-                time: "0:56 - 1:04",
-                title: "The Tech",
-                location: "AI/Veo",
-                cam: "Gemini/Veo",
-                camDetail: "AI Generated clips (Shield/Virus).",
-                action: "Voiceover only over cool visuals.",
-                audio: "Typing sounds + It's Electric",
-                dialogue: "Digital Forensics. Network Defense. We don't just guess; we analyze packets until they confess.",
-                energy: 7,
-                tags: ["ai", "tech"]
-            },
-            {
-                id: 9,
-                time: "1:04 - 1:12",
-                title: "The Course",
-                location: "Gym",
-                cam: "Insta360",
-                camDetail: "Attached to weight plate or equipment.",
-                action: "POV of the weight moving.",
-                audio: "Lux Æterna - Metallica (Chorus)",
-                dialogue: "Take my Network Security course. It’s the bootcamp for your brain. No pain, no secure domain!",
-                energy: 9,
-                tags: ["insta", "gym"]
-            },
-            {
-                id: 10,
-                time: "1:12 - 1:20",
-                title: "The Pitch",
-                location: "Greenhouse",
-                cam: "iPhone 16",
-                camDetail: "Portrait mode.",
-                action: "Holding a vegetable or plant.",
-                audio: "Pop Corn (Returns)",
-                dialogue: "Don't let your career wilt. Grow your skills. Secure the future. Also, eat your veggies.",
-                energy: 4,
-                tags: ["iphone", "funny"]
-            },
-            {
-                id: 11,
-                time: "1:20 - 1:30",
-                title: "Outro",
-                location: "Office",
-                cam: "iPhone 16",
-                camDetail: "Standard shot.",
-                action: "Feet up on desk or spin in chair. Fade to Logo.",
-                audio: "I'll Be Your Baby Tonight - Robert Palmer",
-                dialogue: "I'm Asen. See you in class. Bye for now!",
-                energy: 5,
-                tags: ["iphone", "office"]
-            }
+            { id: 1, time: "0:00 - 0:08", title: "The Hook", location: "Gym", cam: "Insta360", camMode: "Invisible Stick", action: "Bench pressing or curling heavy weights. Intense look.", audio: "Lux Æterna (Metallica)", dialogue: "You think *this* is heavy? Try stopping a DDoS attack on a Friday night!", energy: 9 },
+            { id: 2, time: "0:08 - 0:16", title: "The Intro", location: "Server Room", cam: "iPhone 16", camMode: "Cinematic Mode", action: "Slow pan across blinking lights. Walk in, smile.", audio: "It's Electric (Metallica)", dialogue: "I’m Asen Grozdanov. I teach the new Cybersecurity certificates at Red Deer Polytechnic. Welcome to the matrix.", energy: 7 },
+            { id: 3, time: "0:16 - 0:24", title: "The Program", location: "Office", cam: "iPhone 16", camMode: "Wide Angle", action: "Sophisticated chair shot. Fast hand gestures. Graphics pop up.", audio: "Background Beat", dialogue: "Two paths. 12 weeks for the Essentials Analyst. 14 weeks for the Specialist. Beginner to pro faster than a fiber optic connection.", energy: 5 },
+            { id: 4, time: "0:24 - 0:32", title: "The Contrast", location: "Greenhouse", cam: "Insta360", camMode: "Tiny Planet", action: "Delicately pruning a plant. Intense focus.", audio: "Pop Corn (Hot Butter)", dialogue: "Cybersecurity is just like gardening... except the bugs are Russian botnets and the weeds steal your credit card info.", energy: 3 },
+            { id: 5, time: "0:32 - 0:40", title: "The Jobs", location: "Gym", cam: "iPhone 16", camMode: "Low Angle", action: "Doing pull-ups or hitting punching bag.", audio: "One More Road to Cross (DMX)", dialogue: "This training gets you hired. SOC Analyst, Incident Responder. High demand, high stress, high reward.", energy: 8 },
+            { id: 6, time: "0:40 - 0:48", title: "The Story", location: "Office", cam: "iPhone 16", camMode: "Standard Pro", action: "Lean into camera confidentially.", audio: "Fly Like an Eagle (Seal)", dialogue: "When I worked in Big Tech, they didn't hire me for my looks. They hired me because I could hunt digital ghosts. I'm teaching you those exact same skills.", energy: 6 },
+            { id: 7, time: "0:48 - 0:56", title: "The Why", location: "Server Room", cam: "Insta360", camMode: "Drone Sim", action: "Gesturing to equipment. Walk through.", audio: "Sabbra Cadabra (Metallica)", dialogue: "Why do it? Because grandma needs her pension safe, and the power grid needs to stay on. We are the digital bodyguards of society.", energy: 8 },
+            { id: 8, time: "0:56 - 1:04", title: "The Tech", location: "AI/Veo", cam: "Gemini Ultra", camMode: "AI Gen", action: "Data streams turning into shield. Voiceover only.", audio: "Typing + It's Electric", dialogue: "Digital Forensics. Network Defense. We don't just guess; we analyze packets until they confess.", energy: 7 },
+            { id: 9, time: "1:04 - 1:12", title: "The Course", location: "Gym", cam: "Insta360", camMode: "Equipment Mount", action: "POV of weight moving.", audio: "Lux Æterna (Chorus)", dialogue: "Take my Network Security course. It’s the bootcamp for your brain. No pain, no secure domain!", energy: 10 },
+            { id: 10, time: "1:12 - 1:20", title: "The Pitch", location: "Greenhouse", cam: "iPhone 16", camMode: "Portrait Mode", action: "Holding vegetable or plant.", audio: "Pop Corn (Returns)", dialogue: "Don't let your career wilt. Grow your skills. Secure the future. Also, eat your veggies.", energy: 4 },
+            { id: 11, time: "1:20 - 1:30", title: "Outro", location: "Office", cam: "iPhone 16", camMode: "Standard", action: "Feet up on desk or spin in chair. Fade to Logo.", audio: "I'll Be Your Baby Tonight (Robert Palmer)", dialogue: "I'm Asen. See you in class. Bye for now!", energy: 5 }
         ];
 
-        // --- STATE MANAGEMENT ---
+        const budgetData = {
+            categories: ["Crew/Gear", "B-Roll/FX", "Editing"],
+            classical: [3500, 800, 1500],
+            ai: [0, 27, 0]
+        };
+
         let currentFilter = 'all';
-        let activeSceneId = null;
 
-        // --- DOM ELEMENTS ---
-        const sceneListContainer = document.getElementById('scene-list-container');
-        const sceneDetailPanel = document.getElementById('scene-detail-panel');
-        const countDisplay = document.getElementById('scene-count-display');
+        // --- NAVIGATION ---
+        function switchTab(tabId) {
+            // Hide all views
+            ['execution', 'analytics', 'budget'].forEach(id => {
+                document.getElementById(`view-${id}`).classList.add('hidden');
+                document.getElementById(`tab-${id}`).classList.remove('tab-active', 'text-slate-800');
+                document.getElementById(`tab-${id}`).classList.add('text-slate-500');
+            });
+            // Show selected
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).classList.add('tab-active', 'text-slate-800');
+            document.getElementById(`tab-${tabId}`).classList.remove('text-slate-500');
 
-        // --- CORE LOGIC ---
-
-        function init() {
-            renderSceneList();
-            renderCharts();
-            countDisplay.innerText = scenes.length;
-            // Select first scene by default
-            selectScene(1);
+            // Trigger chart resize if needed
+            if (tabId === 'analytics') {
+                renderAnalyticsCharts();
+            }
+            if (tabId === 'budget') {
+                renderBudgetChart();
+            }
         }
 
-        // Render the list of scenes (Left Column)
-        function renderSceneList() {
-            sceneListContainer.innerHTML = '';
+        // --- EXECUTION VIEW ---
+        function filterScenes(location) {
+            currentFilter = location;
+            renderSceneList();
             
-            const filteredScenes = currentFilter === 'all' 
-                ? scenes 
-                : scenes.filter(s => {
-                    if (currentFilter === 'Server') return s.location === 'Server Room';
-                    return s.location === currentFilter;
-                });
+            // Update filter button styles
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.includes(location) || (location === 'all' && btn.textContent.includes('All'))) {
+                    btn.classList.add('ring-2', 'ring-orange-500', 'ring-offset-1');
+                } else {
+                    btn.classList.remove('ring-2', 'ring-orange-500', 'ring-offset-1');
+                }
+            });
+        }
 
-            filteredScenes.forEach(scene => {
-                const card = document.createElement('div');
-                card.className = `scene-card bg-white p-4 rounded-lg shadow-sm border border-stone-200 cursor-pointer ${activeSceneId === scene.id ? 'active' : ''}`;
-                card.onclick = () => selectScene(scene.id);
+        function renderSceneList() {
+            const listContainer = document.getElementById('scene-list');
+            listContainer.innerHTML = '';
 
-                // Icon selection based on location
+            const filtered = currentFilter === 'all' ? scenes : scenes.filter(s => s.location === currentFilter);
+
+            filtered.forEach(scene => {
+                const el = document.createElement('div');
+                el.className = `scene-item p-4 mb-3 rounded-lg border border-slate-200 bg-white cursor-pointer hover:shadow-md transition-all`;
+                el.onclick = () => selectScene(scene.id, el);
+                
+                // Icon based on location
                 let icon = '🎬';
                 if(scene.location === 'Gym') icon = '🏋️';
                 if(scene.location === 'Server Room') icon = '💻';
@@ -443,181 +325,132 @@
                 if(scene.location === 'Office') icon = '🏢';
                 if(scene.location === 'AI/Veo') icon = '🤖';
 
-                card.innerHTML = `
+                el.innerHTML = `
                     <div class="flex justify-between items-start">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xl">${icon}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">${icon}</span>
                             <div>
-                                <h4 class="font-bold text-stone-800 text-sm">${scene.title}</h4>
-                                <span class="text-xs text-stone-500">${scene.time} • ${scene.location}</span>
+                                <h4 class="font-bold text-slate-800 text-sm">${scene.title}</h4>
+                                <span class="text-xs text-slate-500 font-mono">${scene.time}</span>
                             </div>
                         </div>
-                        <span class="text-xs font-mono bg-stone-100 px-1 rounded text-stone-500">#${scene.id}</span>
                     </div>
+                    <div class="mt-2 text-xs text-slate-600 truncate">${scene.dialogue}</div>
                 `;
-                sceneListContainer.appendChild(card);
+                listContainer.appendChild(el);
             });
         }
 
-        // Render the detail view (Right Column)
-        function selectScene(id) {
-            activeSceneId = id;
-            renderSceneList(); // Re-render to update active state styling
+        function selectScene(id, element) {
+            // UI Selection State
+            document.querySelectorAll('.scene-item').forEach(el => el.classList.remove('active'));
+            if(element) element.classList.add('active');
 
             const scene = scenes.find(s => s.id === id);
-            
-            // Build Tags HTML
-            let tagsHtml = '';
-            scene.tags.forEach(tag => {
-                let className = 'tag-iphone';
-                if(tag === 'insta') className = 'tag-insta';
-                if(tag === 'ai') className = 'tag-ai';
-                tagsHtml += `<span class="tech-tag ${className}">${tag.toUpperCase()}</span>`;
-            });
+            const container = document.getElementById('scene-detail-content');
 
-            sceneDetailPanel.innerHTML = `
-                <div class="w-full h-full flex flex-col text-left animate-fade-in">
-                    <div class="flex justify-between items-start mb-6 border-b border-stone-100 pb-4">
+            // Icon
+            let icon = '🎬';
+            if(scene.location === 'Gym') icon = '🏋️';
+            if(scene.location === 'Server Room') icon = '💻';
+            if(scene.location === 'Greenhouse') icon = '🌱';
+            if(scene.location === 'Office') icon = '🏢';
+            if(scene.location === 'AI/Veo') icon = '🤖';
+
+            container.innerHTML = `
+                <div>
+                    <div class="flex items-center justify-between mb-6 border-b border-slate-200 pb-4">
                         <div>
-                            <span class="text-xs font-bold text-stone-400 uppercase tracking-wider">Scene ${scene.id} • ${scene.time}</span>
-                            <h2 class="text-3xl font-extrabold text-stone-900 mt-1">${scene.title}</h2>
+                            <span class="bg-orange-100 text-orange-800 text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">${scene.time}</span>
+                            <h2 class="text-3xl font-extrabold text-slate-900 mt-2">${scene.title}</h2>
                         </div>
-                        <div class="flex gap-2">${tagsHtml}</div>
+                        <span class="text-5xl">${icon}</span>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div class="bg-stone-50 p-4 rounded-lg border border-stone-100">
-                            <label class="text-xs font-bold text-stone-500 uppercase flex items-center gap-1">📍 Location & Action</label>
-                            <p class="text-lg font-bold text-stone-800 mt-1">${scene.location}</p>
-                            <p class="text-stone-700 mt-2 text-sm leading-relaxed">${scene.action}</p>
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-white p-3 rounded border border-slate-200 shadow-sm">
+                            <div class="text-xs text-slate-500 uppercase font-bold">Location</div>
+                            <div class="font-semibold text-slate-800">${scene.location}</div>
                         </div>
-                        <div class="bg-orange-50 p-4 rounded-lg border border-orange-100">
-                            <label class="text-xs font-bold text-orange-600 uppercase flex items-center gap-1">🎥 Equipment & Shot</label>
-                            <p class="text-lg font-bold text-stone-800 mt-1">${scene.cam}</p>
-                            <p class="text-stone-700 mt-2 text-sm leading-relaxed">${scene.camDetail}</p>
+                        <div class="bg-white p-3 rounded border border-slate-200 shadow-sm">
+                            <div class="text-xs text-slate-500 uppercase font-bold">Camera</div>
+                            <div class="font-semibold text-slate-800">${scene.cam} <span class="text-xs font-normal text-slate-500">(${scene.camMode})</span></div>
                         </div>
                     </div>
 
                     <div class="mb-6">
-                        <label class="text-xs font-bold text-stone-500 uppercase">🎵 Audio Queue</label>
-                        <div class="flex items-center gap-3 mt-1 bg-stone-800 text-white p-3 rounded-md">
-                            <span>🔊</span>
-                            <span class="font-mono text-sm">${scene.audio}</span>
+                        <div class="text-xs text-slate-500 uppercase font-bold mb-1">Audio & Music</div>
+                        <div class="flex items-center gap-2 text-slate-800 font-medium bg-slate-100 p-3 rounded">
+                            <span>🎵</span> ${scene.audio}
                         </div>
                     </div>
 
-                    <div class="flex-1 bg-white border-l-4 border-stone-300 pl-6 py-2">
-                        <label class="text-xs font-bold text-stone-400 uppercase mb-2 block">Script / Dialogue</label>
-                        <p class="text-xl text-stone-900 italic font-serif leading-relaxed">"${scene.dialogue}"</p>
+                    <div class="mb-6">
+                        <div class="text-xs text-slate-500 uppercase font-bold mb-1">Action</div>
+                        <p class="text-slate-700 italic border-l-2 border-orange-400 pl-3">${scene.action}</p>
                     </div>
+                </div>
+
+                <div class="bg-slate-800 text-white p-6 rounded-lg shadow-lg transform translate-y-2">
+                    <div class="text-xs text-slate-400 uppercase font-bold mb-2">Dialogue</div>
+                    <p class="text-xl font-serif leading-relaxed">"${scene.dialogue}"</p>
                 </div>
             `;
         }
 
-        // Filter Logic
-        function filterScenes(filter) {
-            currentFilter = filter;
-            renderSceneList();
-        }
+        // --- CHARTS ---
+        let energyChartInst = null;
+        let locationChartInst = null;
+        let budgetChartInst = null;
 
-        // Tab Switching Logic
-        function switchTab(tabName) {
-            // Hide all
-            document.getElementById('view-storyboard').classList.add('hidden-section');
-            document.getElementById('view-analytics').classList.add('hidden-section');
-            document.getElementById('view-tech').classList.add('hidden-section');
-            
-            // Reset Buttons
-            ['storyboard', 'analytics', 'tech'].forEach(t => {
-                const btn = document.getElementById(`tab-${t}`);
-                btn.classList.remove('bg-white', 'text-stone-900', 'shadow');
-                btn.classList.add('text-stone-600');
-            });
+        function renderAnalyticsCharts() {
+            if (energyChartInst) return; // Already rendered
 
-            // Show Active
-            document.getElementById(`view-${tabName}`).classList.remove('hidden-section');
-            
-            // Style Active Button
-            const activeBtn = document.getElementById(`tab-${tabName}`);
-            activeBtn.classList.add('bg-white', 'text-stone-900', 'shadow');
-            activeBtn.classList.remove('text-stone-600');
-        }
-
-        // Clipboard Copy Utility
-        function copyToClipboard(id) {
-            let text = "";
-            if(id === 'p1') text = "Cinematic close up, abstract visualization of digital data streams, glowing blue and green binary code, forming a protective shield shape, dark background, cyberpunk style, high resolution, photorealistic.";
-            if(id === 'p2') text = "Abstract digital visualization of a red computer virus being quarantined by a green digital grid, moody lighting, technological interface style.";
-            
-            navigator.clipboard.writeText(text).then(() => {
-                const msg = document.getElementById(`${id}-msg`);
-                msg.classList.remove('hidden');
-                setTimeout(() => msg.classList.add('hidden'), 2000);
-            });
-        }
-
-        // --- CHARTS (Chart.js) ---
-        function renderCharts() {
-            // 1. Energy Flow Chart (Line)
+            // Energy Chart
             const ctxEnergy = document.getElementById('energyChart').getContext('2d');
-            new Chart(ctxEnergy, {
+            energyChartInst = new Chart(ctxEnergy, {
                 type: 'line',
                 data: {
                     labels: scenes.map(s => s.title),
                     datasets: [{
-                        label: 'Scene Intensity (1-10)',
+                        label: 'Scene Intensity',
                         data: scenes.map(s => s.energy),
-                        borderColor: '#ea580c', // Orange 600
+                        borderColor: '#ea580c',
                         backgroundColor: 'rgba(234, 88, 12, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.4, // Smooth curves
+                        borderWidth: 2,
+                        tension: 0.3,
                         fill: true,
+                        pointRadius: 4,
                         pointBackgroundColor: '#fff',
-                        pointBorderColor: '#ea580c',
-                        pointRadius: 5
+                        pointBorderColor: '#ea580c'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
                     scales: {
-                        y: {
-                            min: 0,
-                            max: 10,
-                            title: { display: true, text: 'Energy Level' }
-                        },
-                        x: {
-                            display: false // Hide x labels for cleaner look, tooltip handles it
-                        }
+                        y: { min: 0, max: 10, ticks: { stepSize: 2 } },
+                        x: { display: false } // Hide X labels for cleaner UI, rely on tooltips
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: (c) => `Energy: ${c.raw}/10` } }
                     }
                 }
             });
 
-            // 2. Location Breakdown (Doughnut)
-            // Calculate counts
+            // Location Chart
             const locCounts = {};
-            scenes.forEach(s => {
-                const loc = s.location === 'AI/Veo' ? 'Tech/AI' : s.location;
-                locCounts[loc] = (locCounts[loc] || 0) + 1;
-            });
-
+            scenes.forEach(s => { locCounts[s.location] = (locCounts[s.location] || 0) + 1; });
+            
             const ctxLoc = document.getElementById('locationChart').getContext('2d');
-            new Chart(ctxLoc, {
+            locationChartInst = new Chart(ctxLoc, {
                 type: 'doughnut',
                 data: {
                     labels: Object.keys(locCounts),
                     datasets: [{
                         data: Object.values(locCounts),
-                        backgroundColor: [
-                            '#fca5a5', // Gym (Red-ish)
-                            '#86efac', // Greenhouse (Green)
-                            '#93c5fd', // Server (Blue)
-                            '#cbd5e1', // Office (Grey)
-                            '#d8b4fe'  // AI (Purple)
-                        ],
+                        backgroundColor: ['#fdba74', '#93c5fd', '#86efac', '#cbd5e1', '#d8b4fe'],
                         borderWidth: 0
                     }]
                 },
@@ -625,17 +458,80 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'right' }
+                        legend: { position: 'right', labels: { boxWidth: 12 } }
                     }
                 }
             });
         }
 
-        // Run Init
-        init();
+        function renderBudgetChart() {
+            if (budgetChartInst) return;
+
+            const ctxBudget = document.getElementById('budgetChart').getContext('2d');
+            budgetChartInst = new Chart(ctxBudget, {
+                type: 'bar',
+                data: {
+                    labels: budgetData.categories,
+                    datasets: [
+                        {
+                            label: 'Classical Agency',
+                            data: budgetData.classical,
+                            backgroundColor: '#ef4444', // Red for expensive
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Your Setup (AI)',
+                            data: budgetData.ai,
+                            backgroundColor: '#22c55e', // Green for savings
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            title: { display: true, text: 'Cost (USD)' }
+                        },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- INIT ---
+        window.onload = function() {
+            renderSceneList();
+            // Default select first scene
+            const firstItem = document.querySelector('.scene-item');
+            if(firstItem) firstItem.click();
+        };
 
     </script>
 </body>
 </html>
+
+
+
 
 
